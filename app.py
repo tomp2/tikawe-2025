@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 import uuid
-from flask import Flask, g, send_file, render_template, request, redirect, url_for, session
+from flask import Flask, g, send_file, render_template, request, redirect, url_for, session, json
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import config
@@ -22,6 +22,22 @@ def index():
     query = "SELECT * FROM doodles ORDER BY created_at DESC LIMIT 10"
     doodles = db.execute(query).fetchall()
     return render_template("home.html", doodles=doodles)
+
+
+@app.route("/doodle/<int:doodle_id>")
+def view_doodle(doodle_id):
+    db = get_db()
+    db.execute("UPDATE doodles SET views = views + 1 WHERE id = ?", (doodle_id,))
+    db.commit()
+    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    comments = db.execute(
+        "SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE doodle_id = ?",
+        (doodle_id,)
+    ).fetchall()
+
+    reactions = json.loads(doodle["reactions"])
+    decoded_reactions = {chr(int(key, 16)): value for key, value in reactions.items()}
+    return render_template("doodle.html", doodle=doodle, comments=comments, reactions=decoded_reactions)
 
 
 @app.route("/submit", methods=["GET"])
@@ -71,7 +87,6 @@ def submit_doodle():
     safe_filename = USER_IMAGE_UPLOADS / filename
 
     image.save(safe_filename)
-
 
     created_at = datetime.utcnow().isoformat()
 
