@@ -1,6 +1,7 @@
 import sqlite3
+from datetime import datetime
 from pathlib import Path
-
+import uuid
 from flask import Flask, g, send_file, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -18,9 +19,71 @@ if not USER_IMAGE_UPLOADS.exists():
 @app.route("/")
 def index():
     db = get_db()
-    query = "SELECT * FROM doodles ORDER BY views DESC LIMIT 10"
+    query = "SELECT * FROM doodles ORDER BY created_at DESC LIMIT 10"
     doodles = db.execute(query).fetchall()
     return render_template("home.html", doodles=doodles)
+
+
+@app.route("/submit", methods=["GET"])
+def submit():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    return render_template("submit.html")
+
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+
+def is_allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/submit', methods=['POST'])
+def submit_doodle():
+    user_id = session.get('user_id')
+    if user_id is None:
+        return 'Not logged in', 401
+
+    if 'image' not in request.files:
+        return 'No image uploaded', 400
+
+    title = request.form['title']
+    if not title:
+        return 'Title is required', 400
+    if len(title) > 40:
+        return 'Title is too long', 400
+    if len(title) < 3:
+        return 'Title is too short', 400
+
+    description = request.form['description']
+    if len(description) > 80:
+        return 'Description is too long', 400
+
+    tags = request.form['tags']
+    if len(tags) > 40:
+        return 'Tags are too long', 400
+
+    image = request.files['image']
+    if not image or not is_allowed_file(image.filename):
+        return 'Invalid file type', 400
+
+    filename = f'{uuid.uuid4()}.png'
+    safe_filename = USER_IMAGE_UPLOADS / filename
+
+    image.save(safe_filename)
+
+
+    created_at = datetime.utcnow().isoformat()
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO doodles (title, description, tags, image_url, user_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (title, description, tags, safe_filename.name, user_id, created_at))
+    conn.commit()
+
+    return redirect('/')
 
 
 @app.route("/register", methods=["GET", "POST"])

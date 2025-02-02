@@ -67,7 +67,7 @@ footer {
     flex-direction: column;
 }
 
-.register-form {
+.form {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
