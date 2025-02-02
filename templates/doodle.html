@@ -6,14 +6,21 @@
     <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="mx-auto">
     <div class="reactions">
       {% for emoji, count in reactions.items() %}
-        <p>{{ emoji }}x{{ count }}</p>
+        <form action="/doodle/{{ doodle.id }}/react" method="POST">
+          <input type="hidden" name="emoji" value="{{ emoji }}">
+          <button
+                  type="submit"
+                  data-is-active="{% if emoji in user_reactions %}true{% else %}false{% endif %}"
+          >
+            {{ emoji }}x{{ count }}
+          </button>
+        </form>
       {% endfor %}
       <form action="/doodle/{{ doodle.id }}/react" method="POST">
         <label for="emoji">React with:</label>
         <select name="emoji" id="emoji">
           <option value="👍">👍</option>
           <option value="😀">😀</option>
-          <option value="❤️">❤️</option>
           <option value="🎉">🎉</option>
           <option value="🔥">🔥</option>
           <option value="😑">😑</option>

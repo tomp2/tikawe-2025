@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 import uuid
-from flask import Flask, g, send_file, render_template, request, redirect, url_for, session, json
+from flask import Flask, g, send_file, render_template, request, redirect, url_for, session, json, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import config
@@ -35,9 +35,56 @@ def view_doodle(doodle_id):
         (doodle_id,)
     ).fetchall()
 
-    reactions = json.loads(doodle["reactions"])
-    decoded_reactions = {chr(int(key, 16)): value for key, value in reactions.items()}
-    return render_template("doodle.html", doodle=doodle, comments=comments, reactions=decoded_reactions)
+    reactions = db.execute(
+        "SELECT emoji, COUNT(*) as count FROM reactions WHERE doodle_id = ? GROUP BY emoji",
+        (doodle_id,)
+    ).fetchall()
+
+    decoded_reactions = {
+        chr(int(reaction["emoji"], 16)): reaction["count"]
+        for reaction in reactions
+    }
+
+    decoded_users_reactions = {}
+    if "user_id" in session:
+        post_reactions = db.execute(
+            "SELECT emoji FROM reactions WHERE doodle_id = ? AND user_id = ?",
+            (doodle_id, session["user_id"])
+        ).fetchall()
+
+        decoded_users_reactions = {chr(int(reaction["emoji"], 16)) for reaction in post_reactions}
+
+    return render_template("doodle.html", doodle=doodle, comments=comments, reactions=decoded_reactions,
+                           user_reactions=decoded_users_reactions)
+
+
+@app.route("/doodle/<int:doodle_id>/react", methods=["POST"])
+def toggle_reaction(doodle_id):
+
+    print(request.form)
+
+    if "user_id" not in session:
+        flash("You must be logged in to react.", "error")
+        return redirect(url_for("view_doodle", doodle_id=doodle_id))
+
+    emoji = request.form["emoji"]
+    encoded_emoji = hex(ord(emoji))[2:]
+
+    db = get_db()
+    existing = db.execute(
+        "SELECT * FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
+        (doodle_id, session["user_id"], encoded_emoji),
+    ).fetchone()
+
+    if existing:
+        db.execute("DELETE FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
+                   (doodle_id, session["user_id"], encoded_emoji))
+    else:
+        db.execute("INSERT INTO reactions (doodle_id, user_id, emoji, created_at) VALUES (?, ?, ?, ?)",
+                   (doodle_id, session["user_id"], encoded_emoji, datetime.utcnow().isoformat()))
+
+    db.commit()
+    return redirect(url_for("view_doodle", doodle_id=doodle_id))
 
 
 @app.route("/submit", methods=["GET"])
@@ -117,6 +164,45 @@ def delete_doodle(doodle_id):
     db.commit()
 
     return redirect(url_for("index"))
+
+
+@app.route("/doodle/<int:doodle_id>/comment", methods=["POST"])
+def add_comment(doodle_id):
+    if "user_id" not in session:
+        return {"error": "Unauthorized"}, 401
+
+    user_id = session["user_id"]
+    content = request.json.get("content")
+
+    if not content or len(content) > 500:
+        return {"error": "Invalid comment"}, 400
+
+    db = get_db()
+    db.execute(
+        "INSERT INTO comments (doodle_id, user_id, content, created_at) VALUES (?, ?, ?, ?)",
+        (doodle_id, user_id, content, datetime.utcnow().isoformat()),
+    )
+    db.commit()
+
+    return {"success": True}, 200
+
+
+@app.route("/doodle/<int:doodle_id>/comment/<int:comment_id>/delete", methods=["POST"])
+def delete_comment(doodle_id, comment_id):
+    if "user_id" not in session:
+        return {"error": "Unauthorized"}, 401
+
+    user_id = session["user_id"]
+    db = get_db()
+    comment = db.execute("SELECT * FROM comments WHERE id = ?", (comment_id,)).fetchone()
+
+    if not comment or comment["user_id"] != user_id:
+        return {"error": "Forbidden"}, 403
+
+    db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
+    db.commit()
+
+    return {"success": True}, 200
 
 
 @app.route("/register", methods=["GET", "POST"])
