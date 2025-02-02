@@ -12,3 +12,25 @@
 - Julkaisuihin voi liittää tageja, jotka helpottavat julkaisujen löytämistä (esim. #valkotaulu, #piirustus, #vitsit).
 - Käyttäjä voi nähdä tilastotietoja omista julkaisuistaan
 - Käyttäjä voi selata tykkäämiään julkaisuja
+
+## Sovelluksen asennus
+
+1. Kloonaa tämä repositorio koneellesi
+   ```
+    git clone 
+    ```
+2. Asenna riippuvuudet
+   ```
+   pip install flask
+   ```
+3. Alusta tiedot tietokantaan
+   ```bash
+   sqlite3 data.db < schema.sql
+   sqlite3 data.db < seed.sql
+   ```
+
+## Sovelluksen käynnistäminen
+
+```
+flask run
+```

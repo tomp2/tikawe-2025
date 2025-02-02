@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS doodles
     title       TEXT    NOT NULL,
     description TEXT    NOT NULL,
     tags        TEXT    NOT NULL,
-    image_data  BLOB    NOT NULL,
+    image_url   TEXT    NOT NULL,
     user_id     INTEGER NOT NULL,
     created_at  TEXT    NOT NULL,
     views       INTEGER DEFAULT 0,

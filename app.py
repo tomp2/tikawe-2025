@@ -1,13 +1,17 @@
 import sqlite3
 from pathlib import Path
 
-from flask import Flask, g
+from flask import Flask, g, send_file
 
 import config
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
 DATABASE = Path("data.db")
+USER_IMAGE_UPLOADS = Path("user_image_uploads")
+
+if not USER_IMAGE_UPLOADS.exists():
+    USER_IMAGE_UPLOADS.mkdir()
 
 
 def get_db():
@@ -39,6 +43,14 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
         print("Database created")
+
+
+@app.route('/image/<filename>')
+def serve_image(filename):
+    if (safe_path := USER_IMAGE_UPLOADS / filename).exists():
+        return send_file(safe_path)
+    else:
+        return 'File not found', 404
 
 
 if __name__ == '__main__':
