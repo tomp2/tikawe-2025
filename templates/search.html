@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block title %}Search Doodles - Doodle App{% endblock %}
+{% block content %}
+  <div class="container">
+    <h2>Search Doodles</h2>
+
+    <form action="{{ url_for('search_doodles') }}" method="GET">
+      <label for="q">Search:</label>
+      <input type="text" id="query" name="q" placeholder="Search by title or description..." value="{{ query }}"
+             required>
+      <button type="submit">Search</button>
+    </form>
+    {% if query %}
+      <h3>Results for "{{ query }}"</h3>
+      {% if doodles %}
+        <div class="doodles">
+          {% if doodles == [] %}
+            <p>No doodles found.</p>
+          {% else %}
+            {% for doodle in doodles %}
+              <div class="post">
+                <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="photo">
+                <h3>{{ doodle.title }}</h3>
+                <p>{{ doodle.description }}</p>
+                <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+                <p><strong>Likes:</strong> {{ doodle.likes }}</p>
+                <p><strong>Views:</strong> {{ doodle.views }}</p>
+                <a href="/doodle/{{ doodle.id }}">View Details</a>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% else %}
+        <p>No doodles found for "{{ query }}".</p>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}

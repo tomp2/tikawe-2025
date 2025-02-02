@@ -73,9 +73,25 @@ def view_doodle(doodle_id):
                            user_reactions=decoded_users_reactions)
 
 
+@app.route("/search", methods=["GET"])
+def search_doodles():
+    query = request.args.get("q", "").strip()
+    db = get_db()
+
+    if query:
+        search_query = f"%{query}%"
+        doodles = db.execute(
+            "SELECT * FROM doodles WHERE title || ' ' || description LIKE ? ORDER BY created_at DESC",
+            (search_query,),
+        ).fetchall()
+    else:
+        doodles = []
+
+    return render_template("search.html", doodles=doodles, query=query)
+
+
 @app.route("/doodle/<int:doodle_id>/react", methods=["POST"])
 def toggle_reaction(doodle_id):
-
     print(request.form)
 
     if "user_id" not in session:
