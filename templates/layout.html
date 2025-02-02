@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='utils.css') }}">
+  <title>{% block title %}Doodle App{% endblock %}</title>
+</head>
+<body class="mx-auto">
+<header>
+  <h1>Doodle App</h1>
+  <nav class="space-x-2">
+    <a href="/">Home</a>
+    {% if session.get('user_id') %}
+      <a href="/submit">Submit Doodle</a>
+      <a href="/logout">Logout</a>
+    {% else %}
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    {% endif %}
+  </nav>
+</header>
+<main>
+  {% block content %}{% endblock %}
+</main>
+<footer>
+  <p>&copy; 2025 Doodle App</p>
+</footer>
+</body>
+</html>

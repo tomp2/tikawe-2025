@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-from flask import Flask, g, send_file
+from flask import Flask, g, send_file, render_template
 
 import config
 
@@ -12,6 +12,22 @@ USER_IMAGE_UPLOADS = Path("user_image_uploads")
 
 if not USER_IMAGE_UPLOADS.exists():
     USER_IMAGE_UPLOADS.mkdir()
+
+
+@app.route("/")
+def index():
+    db = get_db()
+    query = "SELECT * FROM doodles ORDER BY views DESC LIMIT 10"
+    doodles = db.execute(query).fetchall()
+    return render_template("home.html", doodles=doodles)
+
+
+@app.route('/image/<filename>')
+def serve_image(filename):
+    if (safe_path := USER_IMAGE_UPLOADS / filename).exists():
+        return send_file(safe_path)
+    else:
+        return 'File not found', 404
 
 
 def get_db():
@@ -43,14 +59,6 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
         print("Database created")
-
-
-@app.route('/image/<filename>')
-def serve_image(filename):
-    if (safe_path := USER_IMAGE_UPLOADS / filename).exists():
-        return send_file(safe_path)
-    else:
-        return 'File not found', 404
 
 
 if __name__ == '__main__':

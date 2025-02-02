@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Home - Doodle App{% endblock %}
+{% block content %}
+  <h2>Latest Doodles</h2>
+  <div class="doodles">
+    {% for doodle in doodles %}
+      <div class="post">
+        <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="photo">
+        <h3>{{ doodle.title }}</h3>
+        <p>{{ doodle.description }}</p>
+        <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+        <p><strong>Likes:</strong> {{ doodle.likes }}</p>
+        <p><strong>Views:</strong> {{ doodle.views }}</p>
+        <a href="/doodle/{{ doodle.id }}">View Details</a>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
