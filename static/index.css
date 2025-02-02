@@ -65,6 +65,7 @@ footer {
     border: var(--border);
     display: flex;
     flex-direction: column;
+    max-width: 250px;
 }
 
 .form {

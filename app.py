@@ -24,6 +24,21 @@ def index():
     return render_template("home.html", doodles=doodles)
 
 
+@app.route("/profile")
+def view_profile():
+    if "user_id" not in session:
+        flash("You must be logged in to view your doodles.", "error")
+        return redirect(url_for("login"))
+
+    db = get_db()
+    user_id = session["user_id"]
+    doodles = db.execute(
+        "SELECT * FROM doodles WHERE user_id = ? ORDER BY created_at DESC",
+        (user_id,)
+    ).fetchall()
+    return render_template("home.html", doodles=doodles)
+
+
 @app.route("/doodle/<int:doodle_id>")
 def view_doodle(doodle_id):
     db = get_db()
@@ -163,7 +178,7 @@ def delete_doodle(doodle_id):
     db.execute("DELETE FROM doodles WHERE id = ?", (doodle_id,))
     db.commit()
 
-    return redirect(url_for("index"))
+    return redirect(url_for("view_profile"))
 
 
 @app.route("/doodle/<int:doodle_id>/comment", methods=["POST"])
