@@ -1,7 +1,8 @@
 import sqlite3
 from pathlib import Path
 
-from flask import Flask, g, send_file, render_template
+from flask import Flask, g, send_file, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import config
 
@@ -20,6 +21,48 @@ def index():
     query = "SELECT * FROM doodles ORDER BY views DESC LIMIT 10"
     doodles = db.execute(query).fetchall()
     return render_template("home.html", doodles=doodles)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        db = get_db()
+        hashed_password = generate_password_hash(password)
+        try:
+            db.execute(
+                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                (username, hashed_password)
+            )
+            db.commit()
+            user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+            session["user_id"] = user["id"]
+            return redirect(url_for("index"))
+        except sqlite3.IntegrityError:
+            return "Username taken!"
+
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        db = get_db()
+        user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+        if user and check_password_hash(user["password_hash"], password):
+            session["user_id"] = user["id"]
+            return redirect(url_for("index"))
+        return "Invalid credentials!"
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
 
 
 @app.route('/image/<filename>')
