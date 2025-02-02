@@ -101,6 +101,24 @@ def submit_doodle():
     return redirect('/')
 
 
+@app.route("/doodle/<int:doodle_id>/delete", methods=["POST"])
+def delete_doodle(doodle_id):
+    if "user_id" not in session:
+        return {"error": "Unauthorized"}, 401
+
+    user_id = session["user_id"]
+    db = get_db()
+    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+
+    if not doodle or doodle["user_id"] != user_id:
+        return {"error": "Forbidden"}, 403
+
+    db.execute("DELETE FROM doodles WHERE id = ?", (doodle_id,))
+    db.commit()
+
+    return redirect(url_for("index"))
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":

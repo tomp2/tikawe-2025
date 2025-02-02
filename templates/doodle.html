@@ -39,6 +39,12 @@
       <textarea name="content" placeholder="Add a comment..." required></textarea>
       <button type="submit">Comment</button>
     </form>
+
+    {% if session.get('user_id') == doodle.user_id %}
+      <form action="/doodle/{{ doodle.id }}/delete" method="POST">
+        <button type="submit">Delete Post</button>
+      </form>
+    {% endif %}
   </div>
 {% endblock %}
 
