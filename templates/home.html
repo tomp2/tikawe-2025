@@ -9,6 +9,13 @@
       {% for doodle in doodles %}
         <div class="post">
           <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="photo">
+          {% if doodle.reactions %}
+            <div class="reactions">
+              {% for emoji, count in doodle.reactions.items() %}
+                <div>{{ emoji }}x{{ count }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
           <h3>{{ doodle.title }}</h3>
           <p>{{ doodle.description }}</p>
           <p><strong>Tags:</strong> {{ doodle.tags }}</p>

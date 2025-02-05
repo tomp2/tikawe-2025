@@ -21,6 +21,12 @@ def index():
     db = get_db()
     query = "SELECT * FROM doodles ORDER BY created_at DESC LIMIT 10"
     doodles = db.execute(query).fetchall()
+    doodles_with_decoded_reactions = []
+    for doodle in doodles:
+        reactions = json.loads(doodle["reactions"])
+        decoded_reactions = {chr(int(emoji, 16)): count for emoji, count in reactions.items()}
+        doodle["reactions"] = decoded_reactions
+        doodles_with_decoded_reactions.append(doodle)
     return render_template("home.html", doodles=doodles)
 
 
@@ -54,9 +60,8 @@ def view_doodle(doodle_id):
         "SELECT emoji, COUNT(*) as count FROM reactions WHERE doodle_id = ? GROUP BY emoji",
         (doodle_id,)
     ).fetchall()
-
     decoded_reactions = {
-        chr(int(reaction["emoji"], 16)): reaction["count"]
+        reaction["emoji"]: reaction["count"]
         for reaction in reactions
     }
 
@@ -66,8 +71,7 @@ def view_doodle(doodle_id):
             "SELECT emoji FROM reactions WHERE doodle_id = ? AND user_id = ?",
             (doodle_id, session["user_id"])
         ).fetchall()
-
-        decoded_users_reactions = {chr(int(reaction["emoji"], 16)) for reaction in post_reactions}
+        decoded_users_reactions = {reaction["emoji"] for reaction in post_reactions}
 
     return render_template("doodle.html", doodle=doodle, comments=comments, reactions=decoded_reactions,
                            user_reactions=decoded_users_reactions)
@@ -92,27 +96,33 @@ def search_doodles():
 
 @app.route("/doodle/<int:doodle_id>/react", methods=["POST"])
 def toggle_reaction(doodle_id):
-    print(request.form)
-
     if "user_id" not in session:
         flash("You must be logged in to react.", "error")
         return redirect(url_for("view_doodle", doodle_id=doodle_id))
 
-    emoji = request.form["emoji"]
-    encoded_emoji = hex(ord(emoji))[2:]
+    emoji_character = request.form["emoji"]
 
     db = get_db()
-    existing = db.execute(
+    existing_reaction_row = db.execute(
         "SELECT * FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
-        (doodle_id, session["user_id"], encoded_emoji),
+        (doodle_id, session["user_id"], emoji_character),
     ).fetchone()
 
-    if existing:
+    if existing_reaction_row:
         db.execute("DELETE FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
-                   (doodle_id, session["user_id"], encoded_emoji))
+                   (doodle_id, session["user_id"], emoji_character))
     else:
         db.execute("INSERT INTO reactions (doodle_id, user_id, emoji, created_at) VALUES (?, ?, ?, ?)",
-                   (doodle_id, session["user_id"], encoded_emoji, datetime.utcnow().isoformat()))
+                   (doodle_id, session["user_id"], emoji_character, datetime.utcnow().isoformat()))
+
+    all_doodle_reactions = db.execute(
+        "SELECT COUNT(*) as count, emoji FROM reactions WHERE doodle_id = ? GROUP BY emoji",
+        (doodle_id,)).fetchall()
+    encoded_doodle_row_reactions_json = json.dumps({
+        hex(ord(reaction["emoji"]))[2:]: reaction["count"]
+        for reaction in all_doodle_reactions
+    })
+    db.execute("UPDATE doodles SET reactions = ? WHERE id = ?", (encoded_doodle_row_reactions_json, doodle_id))
 
     db.commit()
     return redirect(url_for("view_doodle", doodle_id=doodle_id))
