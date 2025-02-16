@@ -12,16 +12,16 @@
 <header>
   <h1>Doodle App</h1>
   <nav class="space-x-2">
-    <a href="/">Home</a>
+    <a href={{ url_for('home.page') }}>Home</a>
     {% if session.get('user_id') %}
-      <a href="/submit">Submit Doodle</a>
-      <a href="/profile">Profile</a>
-      <a href="/logout">Logout</a>
+      <a href="{{ url_for('submit.page') }}">Submit Doodle</a>
+      <a href="{{ url_for('profile.page') }}">Profile</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
     {% else %}
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
+      <a href="{{ url_for('login.page') }}">Login</a>
+      <a href="{{ url_for('register.page') }}">Register</a>
     {% endif %}
-    <a href="{{ url_for('search_doodles') }}">Search</a>
+    <a href="{{ url_for('search.page') }}">Search</a>
   </nav>
 </header>
 <main>
