@@ -18,7 +18,8 @@ doodle_blueprint = Blueprint("doodle", __name__, url_prefix="/doodle")
 def page(doodle_id):
     db = get_db()
     db.execute("UPDATE doodles SET views = views + 1 WHERE id = ?", (doodle_id,))
-    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    db.commit()
+
     comments = db.execute(
         "SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE doodle_id = ?",
         (doodle_id,),
