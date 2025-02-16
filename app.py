@@ -5,6 +5,7 @@ from flask import (
     redirect,
     url_for,
     session,
+    render_template,
 )
 
 import config
@@ -39,6 +40,12 @@ app.register_blueprint(submit_blueprint)
 def logout():
     session.clear()
     return redirect(url_for("home.page"))
+
+
+@app.errorhandler(404)
+def not_found(e):
+    """General 404 error handler."""
+    return render_template("not-found.html"), 404
 
 
 @app.route("/image/<filename>")

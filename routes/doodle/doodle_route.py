@@ -43,12 +43,18 @@ def page(doodle_id):
         ).fetchall()
         decoded_users_reactions = {reaction["emoji"] for reaction in post_reactions}
 
+    user_like_row = db.execute(
+        "SELECT * FROM likes WHERE doodle_id = ? AND user_id = ?",
+        (doodle_id, session.get("user_id")),
+    ).fetchone()
+
     return render_template(
         "doodle.html",
         doodle=doodle,
         comments=comments,
         reactions=decoded_reactions,
         user_reactions=decoded_users_reactions,
+        user_has_liked=bool(user_like_row),
     )
 
 
@@ -93,6 +99,44 @@ def toggle_reaction(doodle_id):
     )
 
     db.commit()
+    return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
+
+@doodle_blueprint.route("/<int:doodle_id>/like", methods=["POST"])
+def toggle_like(doodle_id):
+    if "user_id" not in session:
+        flash("You must be logged in to react.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
+    db = get_db()
+    existing_like_row = db.execute(
+        "SELECT * FROM likes WHERE doodle_id = ? AND user_id = ?",
+        (doodle_id, session["user_id"]),
+    ).fetchone()
+
+    if existing_like_row:
+        db.execute(
+            "DELETE FROM likes WHERE doodle_id = ? AND user_id = ?",
+            (doodle_id, session["user_id"]),
+        )
+        like_count_change = -1
+    else:
+
+        db.execute(
+            "INSERT INTO likes (doodle_id, user_id) VALUES (?, ?)",
+            (
+                doodle_id,
+                session["user_id"],
+            ),
+        )
+        like_count_change = 1
+
+    db.execute(
+        "UPDATE doodles SET likes = likes + ? WHERE id = ?",
+        (like_count_change, doodle_id),
+    )
+    db.commit()
+
     return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
 
