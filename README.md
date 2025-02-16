@@ -23,6 +23,7 @@
 - Julkaisussa näkee näyttökerrat ja reaktiot
 - Käyttäjät voivat lisätä/poistaa tykkäyksen julkaisusta
 - Käyttäjät voivat kommentoida julkaisuja, ja hallinnoida omia kommenttejaan
+- Julkaisuihin voi liittää tageja, jotka helpottavat vastaavien julkaisujen löytämistä
 
 ## Sovelluksen asennus
 
