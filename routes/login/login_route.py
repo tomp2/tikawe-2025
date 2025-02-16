@@ -4,7 +4,7 @@ from flask import (
     url_for,
     session,
     render_template,
-    Blueprint,
+    Blueprint, flash,
 )
 from werkzeug.security import check_password_hash
 
@@ -26,5 +26,8 @@ def page():
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
             return redirect(url_for("home.page"))
-        return "Invalid credentials!"
+
+        flash("Incorrect username or password", "error")
+
+
     return render_template("login.html")
