@@ -7,6 +7,7 @@ from flask import (
     session,
     Blueprint,
     render_template,
+    flash,
 )
 from werkzeug.security import generate_password_hash
 
@@ -34,6 +35,7 @@ def page():
             session["user_id"] = user["id"]
             return redirect(url_for("home.page"))
         except sqlite3.IntegrityError:
-            return "Username taken!"
+            flash("Username taken!", "error")
+            return redirect(url_for("register.page"))
 
     return render_template("register.html")
