@@ -17,6 +17,10 @@ doodle_blueprint = Blueprint("doodle", __name__, url_prefix="/doodle")
 @doodle_blueprint.route("/<int:doodle_id>")
 def page(doodle_id):
     db = get_db()
+    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    if not doodle:
+        return render_template("post_not_found.html"), 404
+
     db.execute("UPDATE doodles SET views = views + 1 WHERE id = ?", (doodle_id,))
     db.commit()
 
@@ -69,7 +73,7 @@ def toggle_reaction(doodle_id):
         )
     else:
         db.execute(
-            "INSERT INTO reactions (doodle_id, user_id, emoji, created_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO reactions (doodle_id, user_id, emoji) VALUES (?, ?, ?)",
             (doodle_id, session["user_id"], emoji_character),
         )
 

@@ -1,12 +1,13 @@
 import sqlite3
 from pathlib import Path
+from sqlite3 import Connection
 
 from flask import g
 
 from config import DATABASE_PATH
 
 
-def get_db():
+def get_db() -> Connection:
     db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE_PATH)
