@@ -7,6 +7,7 @@ from flask import (
     session,
     Blueprint,
     render_template,
+    flash,
 )
 
 from config import USER_IMAGE_UPLOADS_PATH
@@ -39,23 +40,33 @@ def submit():
         return "Not logged in", 401
 
     if "image" not in request.files:
-        return "No image uploaded", 400
+        flash("No file detected in submission", "error")
+        return redirect(url_for("submit.page"))
 
     title = request.form["title"]
     if not title:
-        return "Title is required", 400
+        flash("Title is required", "error")
+        return redirect(url_for("submit.page"))
     if len(title) > 40:
-        return "Title is too long", 400
+        flash("Title is too long (max 40 characters)", "error")
+        return redirect(url_for("submit.page"))
     if len(title) < 3:
-        return "Title is too short", 400
+        flash("Title is too short (min 3 characters)", "error")
+        return redirect(url_for("submit.page"))
 
     description = request.form["description"]
     if len(description) > 80:
-        return "Description is too long", 400
+        flash("Description is too long (max 80 characters)", "error")
+        return redirect(url_for("submit.page"))
 
     image = request.files["image"]
     if not image or not is_allowed_file(image.filename):
-        return "Invalid file type", 400
+        flash(
+            f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}",
+            "error",
+        )
+        return redirect(url_for("submit.page"))
+
 
     db = get_db()
     all_tag_rows = db.execute("SELECT name FROM tags").fetchall()
@@ -63,11 +74,13 @@ def submit():
 
     tags = request.form.getlist("tags")
     if not tags:
-        return "At least one tag is required", 400
+        flash("At least one tag is required", "error")
+        return redirect(url_for("submit.page"))
     for tag in tags:
         if tag not in all_tags:
             print(f"Invalid tag: {tag}")
-            return "Invalid tag", 400
+            flash(f"Unknown tag: {tag}", "error")
+            return redirect(url_for("submit.page"))
     tags_string = ",".join(tags)
 
     filename = f"{uuid.uuid4()}.png"
