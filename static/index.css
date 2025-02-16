@@ -70,14 +70,30 @@ footer {
     border: var(--border);
     display: flex;
     flex-direction: column;
-    max-width: 250px;
     background-color: var(--card);
+
+    .likes {
+        position: relative;
+    }
+
+    .like-count {
+        color: red;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #3182ce;
+        padding: 0.1rem 0.2rem;
+        border-radius: 0 0 0 0.25rem;
+    }
 
     .reactions {
         margin-top: 0.2rem;
         margin-bottom: 0.2rem;
         display: flex;
         gap: 0.25rem;
+        /* Items to the left*/
+        justify-content: flex-start;
+
 
         div {
             border: var(--border);
@@ -117,32 +133,49 @@ footer {
     padding: 1rem;
     box-shadow: var(--shadow);
     margin-top: 3rem;
-    width: fit-content;
+    max-width: 25rem;
     background-color: var(--card);
+
+    .likes {
+        display: inline;
+
+        .like-button {
+            position: relative;
+            width: 2.75em;
+            height: 2.75em;
+        }
+
+        svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            inset: 0;
+            fill: none;
+        }
+
+        svg[data-liked="true"] {
+            fill: hsl(0, 100%, 67%);
+        }
+
+        .like-count {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            top: 0.5em;
+        }
+    }
 
     img {
         border-radius: var(--radius-md);
         object-fit: contain;
         border: var(--border);
-        max-width: 600px;
-        max-height: 600px;
         width: 100%;
         height: 100%;
     }
 
-    .reactions {
-        display: flex;
-        gap: 0.25rem;
-        margin-bottom: 1rem;
-
-
-        form {
-            margin-left: auto;
-        }
-
-        button[data-is-active="true"] {
-            background-color: #3182ce;
-        }
+    .react-button[data-is-active="true"] {
+        background-color: #3182ce;
     }
 
     h3 {

@@ -2,85 +2,99 @@
 {% block title %}{{ doodle.title }} - Doodle App{% endblock %}
 {% block content %}
   <div class="full-page-post mx-auto">
-    <h2>{{ doodle.title }}</h2>
-    <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="mx-auto">
-
-    <div class="likes">
-  {% if session.get('user_id') != doodle.user_id %}
-    <form action="/doodle/{{ doodle.id }}/like" method="POST">
-      <button type="submit" class="like-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-             fill="{% if user_has_liked %}red{% else %}none{% endif %}"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
-        </svg>
-        <span>{{ doodle.likes }}</span>
-      </button>
-    </form>
-  {% endif %}
-</div>
-
-<div class="reactions">
-  {% if session.get('user_id') != doodle.user_id %}
-    {% for emoji, count in reactions.items() %}
-      <form action="/doodle/{{ doodle.id }}/react" method="POST">
-        <input type="hidden" name="emoji" value="{{ emoji }}">
-        <button type="submit" data-is-active="{% if emoji in user_reactions %}true{% else %}false{% endif %}">
-          {{ emoji }}x{{ count }}
-        </button>
-      </form>
-    {% endfor %}
-    <form action="/doodle/{{ doodle.id }}/react" method="POST">
-      <label for="emoji">React with:</label>
-      <select name="emoji" id="emoji">
-        <option value="👍">👍</option>
-        <option value="😀">😀</option>
-        <option value="🎉">🎉</option>
-        <option value="🔥">🔥</option>
-        <option value="😑">😑</option>
-      </select>
-      <button type="submit">Submit</button>
-    </form>
-  {% endif %}
-</div>
-
-
-    <p>{{ doodle.description }}</p>
-    <p><strong>Tags:</strong> {{ doodle.tags }}</p>
-    <p><strong>Views:</strong> {{ doodle.views }}</p>
-
-    <h3>Comments</h3>
-    {% for comment in comments %}
-      <div>
-        <p>
-          <strong>{{ comment.username }}</strong>: {{ comment.content }}
-        </p>
-        {% if session.get('user_id') == comment.user_id %}
-          <form action="/doodle/{{ doodle.id }}/comment/{{ comment.id }}/delete" method="POST">
-            <button type="submit">Delete Comment</button>
+    <div class="flex items-center justify-between">
+      <h2>{{ doodle.title }}</h2>
+      <div class="likes">
+        {% if session.get('user_id') != doodle.user_id %}
+          <form action="/doodle/{{ doodle.id }}/like" method="POST">
+            <button type="submit" class="like-button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   data-liked="{% if user_has_liked %}true{% else %}false{% endif %}"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+              </svg>
+              <span class="like-count">{{ doodle.likes }}</span>
+            </button>
           </form>
         {% endif %}
       </div>
-    {% endfor %}
+    </div>
 
-    <form action="/doodle/{{ doodle.id }}/comment" method="POST">
-      <label for="add-comment">Add a comment:</label>
-      <textarea
-              id="add-comment"
-              name="content"
-              placeholder="Add a comment..."
-              required
-              minlength="1"
-              maxlength="150"
-      ></textarea>
-      <button type="submit">Send</button>
-    </form>
+    <div class="post-content">
+      <div class="post-upper">
+        <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="mx-auto">
 
-    {% if session.get('user_id') == doodle.user_id %}
-      <form action="/doodle/{{ doodle.id }}/delete" method="POST">
-        <button type="submit">Delete Post</button>
-      </form>
-    {% endif %}
+        <div class="reactions flex items-start gap-2 mb-2">
+          {% if session.get('user_id') != doodle.user_id %}
+            {% for emoji, count in reactions.items() %}
+              <form action="/doodle/{{ doodle.id }}/react" method="POST">
+                <input type="hidden" name="emoji" value="{{ emoji }}">
+                <button class="react-button" type="submit"
+                        data-is-active="{% if emoji in user_reactions %}true{% else %}false{% endif %}">
+                  {{ emoji }}x{{ count }}
+                </button>
+              </form>
+            {% endfor %}
+            <form action="/doodle/{{ doodle.id }}/react" method="POST" class="ml-auto">
+              <label for="emoji" class="sr-only">Select a reaction for post</label>
+              <select name="emoji" id="emoji">
+                <option value="👍">👍</option>
+                <option value="😀">😀</option>
+                <option value="🎉">🎉</option>
+                <option value="🔥">🔥</option>
+                <option value="😑">😑</option>
+              </select>
+              <button type="submit">React</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="post-lower">
+        <p>{{ doodle.description }}</p>
+        <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+        <p><strong>Views:</strong> {{ doodle.views }}</p>
+
+        <h3>Comments</h3>
+        {% for comment in comments %}
+          <div class="mb-1">
+            <p>
+              <strong>{{ comment.username }}</strong>: {{ comment.content }}
+            </p>
+            {% if session.get('user_id') == comment.user_id %}
+              <form action="/doodle/{{ doodle.id }}/comment/{{ comment.id }}/delete" method="POST">
+                <button type="submit">Delete Comment</button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+        {% if session.get('user_id') %}
+          <form action="/doodle/{{ doodle.id }}/comment" method="POST">
+            <label for="add-comment" class="sr-only">Add a comment:</label>
+            <textarea
+                    id="add-comment"
+                    name="content"
+                    placeholder="Add a comment..."
+                    required
+                    minlength="1"
+                    maxlength="150"
+            ></textarea>
+            <button type="submit">Send</button>
+          </form>
+        {% else %}
+          <p><a href="{{ url_for('login.page') }}">Login</a> to comment.</p>
+        {% endif %}
+
+
+        {% if session.get('user_id') == doodle.user_id %}
+          <form action="/doodle/{{ doodle.id }}/delete" method="POST">
+            <button type="submit">Delete Post</button>
+          </form>
+        {% endif %}
+      </div>
+
+
+    </div>
   </div>
 {% endblock %}
 
