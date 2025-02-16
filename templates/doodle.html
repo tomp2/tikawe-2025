@@ -38,13 +38,28 @@
     <h3>Comments</h3>
     {% for comment in comments %}
       <div>
-        <p><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
+        <p>
+          <strong>{{ comment.username }}</strong>: {{ comment.content }}
+        </p>
+      {% if session.get('user_id') == comment.user_id %}
+        <form action="/doodle/{{ doodle.id }}/comment/{{ comment.id }}/delete" method="POST">
+          <button type="submit">Delete Comment</button>
+        </form>
+      {% endif %}
       </div>
     {% endfor %}
 
     <form action="/doodle/{{ doodle.id }}/comment" method="POST">
-      <textarea name="content" placeholder="Add a comment..." required></textarea>
-      <button type="submit">Comment</button>
+      <label for="add-comment">Add a comment:</label>
+      <textarea
+              id="add-comment"
+              name="content"
+              placeholder="Add a comment..."
+              required
+              minlength="1"
+              maxlength="150"
+      ></textarea>
+      <button type="submit">Send</button>
     </form>
 
     {% if session.get('user_id') == doodle.user_id %}

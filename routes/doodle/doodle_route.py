@@ -20,7 +20,6 @@ doodle_blueprint = Blueprint("doodle", __name__, url_prefix="/doodle")
 def page(doodle_id):
     db = get_db()
     db.execute("UPDATE doodles SET views = views + 1 WHERE id = ?", (doodle_id,))
-    db.commit()
     doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
     comments = db.execute(
         "SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE doodle_id = ?",
@@ -123,9 +122,9 @@ def add_comment(doodle_id):
         return {"error": "Unauthorized"}, 401
 
     user_id = session["user_id"]
-    content = request.json.get("content")
+    content = request.form["content"]
 
-    if not content or len(content) > 500:
+    if not content or len(content) > 150:
         return {"error": "Invalid comment"}, 400
 
     db = get_db()
@@ -135,7 +134,7 @@ def add_comment(doodle_id):
     )
     db.commit()
 
-    return {"success": True}, 200
+    return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
 
 @doodle_blueprint.route(
@@ -143,7 +142,8 @@ def add_comment(doodle_id):
 )
 def delete_comment(doodle_id, comment_id):
     if "user_id" not in session:
-        return {"error": "Unauthorized"}, 401
+        flash("You must be logged in to delete a comment.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     user_id = session["user_id"]
     db = get_db()
@@ -152,9 +152,10 @@ def delete_comment(doodle_id, comment_id):
     ).fetchone()
 
     if not comment or comment["user_id"] != user_id:
-        return {"error": "Forbidden"}, 403
+        flash("You can only delete your own comments.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
     db.commit()
 
-    return {"success": True}, 200
+    return redirect(url_for("doodle.page", doodle_id=doodle_id))
