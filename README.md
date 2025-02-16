@@ -14,6 +14,7 @@
 - Käyttäjä voi selata tykkäämiään julkaisuja
 
 ### Nykyinen tilanne
+
 - Rekistöröityminen ja kirjautuminen onnistuu
 - Käyttäjä voi lisätä ja poistaa julkaisuja
 - Käyttäjä voi selata julkaisuja
@@ -27,11 +28,20 @@
    ```
     git clone 
     ```
+2. Mene kansioon
+   ```
+    cd tikawe-2025
+    ```
 2. Asenna riippuvuudet
    ```
    pip install flask
    ```
 3. Alusta tiedot tietokantaan
+   Tiedoston `database.py` suorittaminen luo tietokannan ja lisää siihen esimerkkidataa:
+   ```bash
+   python database.py
+   ```
+   Vaihtoehtoisesti `schema.sql` ja `seed.sql` tiedostot voi suorittaa manuaalisesti:
    ```bash
    sqlite3 data.db < schema.sql
    sqlite3 data.db < seed.sql

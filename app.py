@@ -9,7 +9,6 @@ from flask import (
 
 import config
 from config import USER_IMAGE_UPLOADS_PATH, DATABASE_PATH
-from database import get_db
 from routes.doodle.doodle_route import doodle_blueprint
 from routes.home_route import home_blueprint
 from routes.login.login_route import login_blueprint
@@ -17,6 +16,12 @@ from routes.profile.profile_route import profile_blueprint
 from routes.register.register_route import register_blueprint
 from routes.search.search_route import search_blueprint
 from routes.submit.submit_route import submit_blueprint
+
+if not DATABASE_PATH.exists():
+    print(
+        f"Database file not found: {DATABASE_PATH}. Initialize the database by running `python database.py`"
+    )
+    exit(1)
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -51,17 +56,5 @@ def close_connection(exception):
         db.close()
 
 
-def init_db():
-    print("Initializing database")
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", mode="r") as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-        print("Database created")
-
-
 if __name__ == "__main__":
-    if not DATABASE_PATH.exists():
-        init_db()
     app.run()

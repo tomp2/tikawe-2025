@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 from flask import g
 
@@ -18,3 +19,26 @@ def get_db():
         db.row_factory = make_dicts
 
     return db
+
+
+if __name__ == "__main__":
+    schema = Path("schema.sql").read_text("utf8")
+    seed = Path("seed.sql").read_text("utf8")
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        print("Running schema.sql")
+        conn.executescript(schema)
+        print("Tables created.")
+
+    try:
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            print("Running seed.sql")
+            conn.executescript(seed)
+            print("Tables seeded.")
+    except sqlite3.IntegrityError as e:
+        print(
+            f"Failed to seed database due to integrity error. Maybe the database is already seeded?"
+        )
+        raise e
+
+    print("Database initialized.")
