@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}My Profile - Doodle App{% endblock %}
+{% block content %}
+  <div class="container">
+    <h2>My Profile</h2>
+
+    <section>
+      <h3>My Posts</h3>
+      {% if user_posts %}
+        <div class="doodles">
+          {% for doodle in user_posts %}
+            <div class="post">
+              <img src="/image/{{ doodle.image_url }}" alt="{{ doodle.title }}" class="photo">
+              <h3>{{ doodle.title }}</h3>
+              <p>{{ doodle.description }}</p>
+              <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+              <p><strong>Likes:</strong> {{ doodle.likes }} | <strong>Views:</strong> {{ doodle.views }}</p>
+              <a href="/doodle/{{ doodle.id }}">View Details</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>You haven't posted any doodles yet.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h3>Posts I've Liked</h3>
+      {% if liked_posts %}
+        <div class="doodles">
+          {% for doodle in liked_posts %}
+            <div class="post">
+              <img src="/image/{{ doodle.image_url }}" alt="{{ doodle.title }}" class="photo">
+              <h3>{{ doodle.title }}</h3>
+              <p>{{ doodle.description }}</p>
+              <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+              <p><strong>Likes:</strong> {{ doodle.likes }} | <strong>Views:</strong> {{ doodle.views }}</p>
+              <a href="/doodle/{{ doodle.id }}">View Details</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>You haven't liked any posts yet.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h3>My Comments</h3>
+      {% if user_comments %}
+        <ul class="comments-list">
+          {% for comment in user_comments %}
+            <li>
+              <p>"{{ comment.content }}" on <a href="/doodle/{{ comment.doodle_id }}">{{ comment.title }}</a> ({{ comment.created_at }})</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>You haven't commented on any posts yet.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
