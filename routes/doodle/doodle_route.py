@@ -64,9 +64,14 @@ def toggle_reaction(doodle_id):
         flash("You must be logged in to react.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
-    emoji_character = request.form["emoji"]
-
     db = get_db()
+    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+
+    if not doodle or doodle["user_id"] == session["user_id"]:
+        flash("You cannot react to your own post.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
+    emoji_character = request.form["emoji"]
     existing_reaction_row = db.execute(
         "SELECT * FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
         (doodle_id, session["user_id"], emoji_character),
@@ -105,10 +110,16 @@ def toggle_reaction(doodle_id):
 @doodle_blueprint.route("/<int:doodle_id>/like", methods=["POST"])
 def toggle_like(doodle_id):
     if "user_id" not in session:
-        flash("You must be logged in to react.", "error")
+        flash("You must be logged in to add likes.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     db = get_db()
+    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+
+    if not doodle or doodle["user_id"] == session["user_id"]:
+        flash("You cannot like your own post.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
     existing_like_row = db.execute(
         "SELECT * FROM likes WHERE doodle_id = ? AND user_id = ?",
         (doodle_id, session["user_id"]),
@@ -150,7 +161,8 @@ def delete_doodle(doodle_id):
     doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
     if not doodle or doodle["user_id"] != user_id:
-        return {"error": "Forbidden"}, 403
+        flash("You can only delete your own doodles.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     db.execute("DELETE FROM doodles WHERE id = ?", (doodle_id,))
     db.commit()

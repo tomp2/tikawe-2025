@@ -6,42 +6,44 @@
     <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="mx-auto">
 
     <div class="likes">
-      <form action="/doodle/{{ doodle.id }}/like" method="POST">
-        <button type="submit" class="like-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-               fill="{% if user_has_liked %}red{% else %}none{% endif %}"
-               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
-          </svg>
-          <span>{{ doodle.likes }}</span>
+  {% if session.get('user_id') != doodle.user_id %}
+    <form action="/doodle/{{ doodle.id }}/like" method="POST">
+      <button type="submit" class="like-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+             fill="{% if user_has_liked %}red{% else %}none{% endif %}"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+        </svg>
+        <span>{{ doodle.likes }}</span>
+      </button>
+    </form>
+  {% endif %}
+</div>
+
+<div class="reactions">
+  {% if session.get('user_id') != doodle.user_id %}
+    {% for emoji, count in reactions.items() %}
+      <form action="/doodle/{{ doodle.id }}/react" method="POST">
+        <input type="hidden" name="emoji" value="{{ emoji }}">
+        <button type="submit" data-is-active="{% if emoji in user_reactions %}true{% else %}false{% endif %}">
+          {{ emoji }}x{{ count }}
         </button>
       </form>
-    </div>
+    {% endfor %}
+    <form action="/doodle/{{ doodle.id }}/react" method="POST">
+      <label for="emoji">React with:</label>
+      <select name="emoji" id="emoji">
+        <option value="👍">👍</option>
+        <option value="😀">😀</option>
+        <option value="🎉">🎉</option>
+        <option value="🔥">🔥</option>
+        <option value="😑">😑</option>
+      </select>
+      <button type="submit">Submit</button>
+    </form>
+  {% endif %}
+</div>
 
-    <div class="reactions">
-      {% for emoji, count in reactions.items() %}
-        <form action="/doodle/{{ doodle.id }}/react" method="POST">
-          <input type="hidden" name="emoji" value="{{ emoji }}">
-          <button
-                  type="submit"
-                  data-is-active="{% if emoji in user_reactions %}true{% else %}false{% endif %}"
-          >
-            {{ emoji }}x{{ count }}
-          </button>
-        </form>
-      {% endfor %}
-      <form action="/doodle/{{ doodle.id }}/react" method="POST">
-        <label for="emoji">React with:</label>
-        <select name="emoji" id="emoji">
-          <option value="👍">👍</option>
-          <option value="😀">😀</option>
-          <option value="🎉">🎉</option>
-          <option value="🔥">🔥</option>
-          <option value="😑">😑</option>
-        </select>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
 
     <p>{{ doodle.description }}</p>
     <p><strong>Tags:</strong> {{ doodle.tags }}</p>
@@ -53,11 +55,11 @@
         <p>
           <strong>{{ comment.username }}</strong>: {{ comment.content }}
         </p>
-      {% if session.get('user_id') == comment.user_id %}
-        <form action="/doodle/{{ doodle.id }}/comment/{{ comment.id }}/delete" method="POST">
-          <button type="submit">Delete Comment</button>
-        </form>
-      {% endif %}
+        {% if session.get('user_id') == comment.user_id %}
+          <form action="/doodle/{{ doodle.id }}/comment/{{ comment.id }}/delete" method="POST">
+            <button type="submit">Delete Comment</button>
+          </form>
+        {% endif %}
       </div>
     {% endfor %}
 
