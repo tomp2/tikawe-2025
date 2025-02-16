@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, render_template, session, redirect, url_for
 from database import get_db
 
@@ -15,6 +17,11 @@ def page():
     user_posts = db.execute(
         "SELECT * FROM doodles WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
     ).fetchall()
+    for doodle in user_posts:
+        reactions = json.loads(doodle["reactions"])
+        doodle["reactions"] = {
+            chr(int(emoji, 16)): count for emoji, count in reactions.items()
+        }
 
     liked_posts = db.execute(
         """
@@ -25,6 +32,11 @@ def page():
         """,
         (user_id,),
     ).fetchall()
+    for doodle in liked_posts:
+        reactions = json.loads(doodle["reactions"])
+        doodle["reactions"] = {
+            chr(int(emoji, 16)): count for emoji, count in reactions.items()
+        }
 
     user_comments = db.execute(
         """
@@ -38,5 +50,8 @@ def page():
     ).fetchall()
 
     return render_template(
-        "profile.html", user_posts=user_posts, liked_posts=liked_posts, user_comments=user_comments
+        "profile.html",
+        user_posts=user_posts,
+        liked_posts=liked_posts,
+        user_comments=user_comments,
     )

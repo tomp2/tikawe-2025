@@ -1,3 +1,5 @@
+import json
+
 from flask import (
     request,
     Blueprint,
@@ -33,5 +35,11 @@ def page():
             "SELECT * FROM doodles WHERE title || ' ' || description LIKE ? ORDER BY created_at DESC",
             (search_query,),
         ).fetchall()
+
+    for doodle in doodles:
+        reactions = json.loads(doodle["reactions"])
+        doodle["reactions"] = {
+            chr(int(emoji, 16)): count for emoji, count in reactions.items()
+        }
 
     return render_template("search.html", doodles=doodles, query=query)

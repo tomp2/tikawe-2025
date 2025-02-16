@@ -18,11 +18,24 @@
             <p>No doodles found.</p>
           {% else %}
             {% for doodle in doodles %}
-              <div class="post">
-                <img src="/image/{{ doodle.image_url }}" alt="Doodle Image" class="photo">
+              <div class="small-post">
+                <a href="/doodle/{{ doodle.id }}">
+                  <img src="/image/{{ doodle.image_url }}" alt="Doodle Image">
+                </a>
+                {% if doodle.reactions %}
+                  <div class="reactions">
+                    {% for emoji, count in doodle.reactions.items() %}
+                      <div>{{ emoji }}x{{ count }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
                 <h3>{{ doodle.title }}</h3>
                 <p>{{ doodle.description }}</p>
-                <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+                <div class="tags">
+                  {% for tag in doodle.tags.split(',') %}
+                    <a href="{{ url_for('search.page', q='#'+tag) }}" class="tag-badge">#{{ tag }}</a>
+                  {% endfor %}
+                </div>
                 <p><strong>Likes:</strong> {{ doodle.likes }}</p>
                 <p><strong>Views:</strong> {{ doodle.views }}</p>
                 <a href="/doodle/{{ doodle.id }}">View Details</a>
