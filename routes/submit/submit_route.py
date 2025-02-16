@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 
 from flask import (
     request,
@@ -64,16 +63,14 @@ def submit():
 
     image.save(safe_filename)
 
-    created_at = datetime.utcnow().isoformat()
-
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
         """
-        INSERT INTO doodles (title, description, tags, image_url, user_id, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO doodles (title, description, tags, image_url, user_id)
+        VALUES (?, ?, ?, ?, ?)
     """,
-        (title, description, tags, safe_filename.name, user_id, created_at),
+        (title, description, tags, safe_filename.name, user_id),
     )
     conn.commit()
 

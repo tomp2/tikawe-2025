@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import (
     request,
     redirect,
@@ -71,12 +69,7 @@ def toggle_reaction(doodle_id):
     else:
         db.execute(
             "INSERT INTO reactions (doodle_id, user_id, emoji, created_at) VALUES (?, ?, ?, ?)",
-            (
-                doodle_id,
-                session["user_id"],
-                emoji_character,
-                datetime.utcnow().isoformat(),
-            ),
+            (doodle_id, session["user_id"], emoji_character),
         )
 
     all_doodle_reactions = db.execute(
@@ -129,8 +122,8 @@ def add_comment(doodle_id):
 
     db = get_db()
     db.execute(
-        "INSERT INTO comments (doodle_id, user_id, content, created_at) VALUES (?, ?, ?, ?)",
-        (doodle_id, user_id, content, datetime.utcnow().isoformat()),
+        "INSERT INTO comments (doodle_id, user_id, content) VALUES (?, ?, ?)",
+        (doodle_id, user_id, content),
     )
     db.commit()
 
