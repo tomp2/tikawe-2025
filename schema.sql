@@ -6,6 +6,34 @@ CREATE TABLE IF NOT EXISTS users
     created_at    TEXT        NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS tags
+(
+    name TEXT UNIQUE NOT NULL PRIMARY KEY
+);
+
+INSERT INTO tags (name)
+VALUES ('whiteboard'),
+       ('bathroom'),
+       ('notebook'),
+       ('table'),
+       ('art'),
+       ('random'),
+       ('sketch'),
+       ('fun'),
+       ('math'),
+       ('graffiti'),
+       ('hallway');
+
+CREATE TABLE IF NOT EXISTS doodle_tags
+(
+    doodle_id INTEGER NOT NULL,
+    tag       INTEGER NOT NULL,
+    PRIMARY KEY (doodle_id, tag),
+    FOREIGN KEY (doodle_id) REFERENCES doodles (id),
+    FOREIGN KEY (tag) REFERENCES tags (name)
+);
+
+
 CREATE TABLE IF NOT EXISTS doodles
 (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,

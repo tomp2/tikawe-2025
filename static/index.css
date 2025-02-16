@@ -124,6 +124,20 @@ footer {
 
 }
 
+.tag-badge {
+    display: inline-block;
+    padding: 0.1rem 0.25rem;
+    margin: 0.1rem;
+    background-color: #3182ce;
+    color: white;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+.tag-badge:hover {
+    background-color: #2b6cb0;
+}
+
 .full-page-post {
     display: flex;
     flex-direction: column;

@@ -26,7 +26,10 @@ def is_allowed_file(filename):
 def page():
     if "user_id" not in session:
         return redirect(url_for("login.page"))
-    return render_template("submit.html")
+
+    db = get_db()
+    tags = db.execute("SELECT name FROM tags").fetchall()
+    return render_template("submit.html", tags=tags)
 
 
 @submit_blueprint.route("/", methods=["POST"])
@@ -50,28 +53,42 @@ def submit():
     if len(description) > 80:
         return "Description is too long", 400
 
-    tags = request.form["tags"]
-    if len(tags) > 40:
-        return "Tags are too long", 400
-
     image = request.files["image"]
     if not image or not is_allowed_file(image.filename):
         return "Invalid file type", 400
+
+    db = get_db()
+    all_tag_rows = db.execute("SELECT name FROM tags").fetchall()
+    all_tags = {tag["name"] for tag in all_tag_rows}
+
+    tags = request.form.getlist("tags")
+    if not tags:
+        return "At least one tag is required", 400
+    for tag in tags:
+        if tag not in all_tags:
+            print(f"Invalid tag: {tag}")
+            return "Invalid tag", 400
+    tags_string = ",".join(tags)
 
     filename = f"{uuid.uuid4()}.png"
     safe_filename = USER_IMAGE_UPLOADS_PATH / filename
 
     image.save(safe_filename)
 
-    conn = get_db()
-    cursor = conn.cursor()
+    cursor = db.cursor()
     cursor.execute(
         """
-        INSERT INTO doodles (title, description, tags, image_url, user_id)
+        INSERT INTO doodles (title, description, image_url, user_id, tags)
         VALUES (?, ?, ?, ?, ?)
-    """,
-        (title, description, tags, safe_filename.name, user_id),
+        """,
+        (title, description, safe_filename.name, user_id, tags_string),
     )
-    conn.commit()
+    doodle_id = cursor.lastrowid
 
+    inserts = [(doodle_id, tag) for tag in tags]
+    cursor.executemany(
+        "INSERT INTO doodle_tags (doodle_id, tag) VALUES (?, ?)", inserts
+    )
+
+    db.commit()
     return redirect("/")

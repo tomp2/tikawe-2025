@@ -48,6 +48,10 @@ def page(doodle_id):
         (doodle_id, session.get("user_id")),
     ).fetchone()
 
+    doodle_tags = db.execute(
+        "SELECT tag FROM doodle_tags WHERE doodle_id = ?", (doodle_id,)
+    ).fetchall()
+
     return render_template(
         "doodle.html",
         doodle=doodle,
@@ -55,6 +59,7 @@ def page(doodle_id):
         reactions=decoded_reactions,
         user_reactions=decoded_users_reactions,
         user_has_liked=bool(user_like_row),
+        doodle_tags=doodle_tags,
     )
 
 

@@ -52,7 +52,11 @@
 
       <div class="post-lower">
         <p>{{ doodle.description }}</p>
-        <p><strong>Tags:</strong> {{ doodle.tags }}</p>
+        <div class="tags">
+          {% for tag in doodle_tags %}
+            <a href="{{ url_for('search.page', q='#'+tag.tag) }}" class="tag-badge">#{{ tag.tag }}</a>
+          {% endfor %}
+        </div>
         <p><strong>Views:</strong> {{ doodle.views }}</p>
 
         <h3>Comments</h3>
