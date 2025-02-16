@@ -21,6 +21,8 @@
 - Käyttäjä voi lisätä tai poistaa reaktioita julkaisuihin
 - Käyttäjä voi hakea julkaisuja hakusanalla
 - Julkaisussa näkee näyttökerrat ja reaktiot
+- Käyttäjät voivat lisätä/poistaa tykkäyksen julkaisusta
+- Käyttäjät voivat kommentoida julkaisuja, ja hallinnoida omia kommenttejaan
 
 ## Sovelluksen asennus
 
