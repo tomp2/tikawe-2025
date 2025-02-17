@@ -20,7 +20,7 @@
                   {% endfor %}
                 </div>
               {% endif %}
-              <h3>{{ doodle.title }}</h3>
+              <a href="/doodle/{{ doodle.id }}"><h3>{{ doodle.title }}</h3></a>
               <p>{{ doodle.description }}</p>
               <div class="tags">
                 {% for tag in doodle.tags.split(',') %}
@@ -29,7 +29,6 @@
               </div>
               <p><strong>Likes:</strong> {{ doodle.likes }}</p>
               <p><strong>Views:</strong> {{ doodle.views }}</p>
-              <a href="/doodle/{{ doodle.id }}">View Details</a>
             </div>
           {% endfor %}
         </div>
@@ -54,7 +53,7 @@
                   {% endfor %}
                 </div>
               {% endif %}
-              <h3>{{ doodle.title }}</h3>
+              <a href="/doodle/{{ doodle.id }}"><h3>{{ doodle.title }}</h3></a>
               <p>{{ doodle.description }}</p>
               <div class="tags">
                 {% for tag in doodle.tags.split(',') %}
@@ -63,7 +62,6 @@
               </div>
               <p><strong>Likes:</strong> {{ doodle.likes }}</p>
               <p><strong>Views:</strong> {{ doodle.views }}</p>
-              <a href="/doodle/{{ doodle.id }}">View Details</a>
             </div>
           {% endfor %}
         </div>
@@ -78,7 +76,8 @@
         <ul class="comments-list">
           {% for comment in user_comments %}
             <li>
-              <p>"{{ comment.content }}" on <a href="/doodle/{{ comment.doodle_id }}">{{ comment.title }}</a> ({{ comment.created_at }})</p>
+              <p>"{{ comment.content }}" on <a href="/doodle/{{ comment.doodle_id }}">{{ comment.title }}</a>
+                ({{ comment.created_at }})</p>
             </li>
           {% endfor %}
         </ul>

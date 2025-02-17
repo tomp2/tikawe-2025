@@ -14,7 +14,7 @@
   <nav class="space-x-2">
     <a href={{ url_for('home.page') }}>Home</a>
     {% if session.get('user_id') %}
-      <a href="{{ url_for('submit.page') }}">Submit Doodle</a>
+      <a href="{{ url_for('submit.page') }}">Upload</a>
       <a href="{{ url_for('profile.page') }}">Profile</a>
       <a href="{{ url_for('logout') }}">Logout</a>
     {% else %}

@@ -5,7 +5,7 @@
     <h2>Search Doodles</h2>
 
     <form action="{{ url_for('search.page') }}" method="GET">
-      <label for="q">Search:</label>
+      <label for="query">Search:</label>
       <input type="text" id="query" name="q" placeholder="Search by title or description..." value="{{ query }}"
              required>
       <button type="submit">Search</button>
@@ -29,7 +29,7 @@
                     {% endfor %}
                   </div>
                 {% endif %}
-                <h3>{{ doodle.title }}</h3>
+                <a href="/doodle/{{ doodle.id }}"><h3>{{ doodle.title }}</h3></a>
                 <p>{{ doodle.description }}</p>
                 <div class="tags">
                   {% for tag in doodle.tags.split(',') %}
@@ -38,7 +38,6 @@
                 </div>
                 <p><strong>Likes:</strong> {{ doodle.likes }}</p>
                 <p><strong>Views:</strong> {{ doodle.views }}</p>
-                <a href="/doodle/{{ doodle.id }}">View Details</a>
               </div>
             {% endfor %}
           {% endif %}

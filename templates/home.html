@@ -18,7 +18,7 @@
               {% endfor %}
             </div>
           {% endif %}
-          <h3>{{ doodle.title }}</h3>
+          <a href="/doodle/{{ doodle.id }}"><h3>{{ doodle.title }}</h3></a>
           <p>{{ doodle.description }}</p>
           <div class="tags">
             {% for tag in doodle.tags.split(',') %}
@@ -27,7 +27,6 @@
           </div>
           <p><strong>Likes:</strong> {{ doodle.likes }}</p>
           <p><strong>Views:</strong> {{ doodle.views }}</p>
-          <a href="/doodle/{{ doodle.id }}">View Details</a>
         </div>
       {% endfor %}
     {% endif %}
