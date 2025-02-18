@@ -10,13 +10,13 @@
         <div class="doodles-grid-container">
           {% for doodle in user_posts %}
             <div class="small-post">
-              <a href="/doodle/{{ doodle.id }}">
+              <a href="/doodle/{{ doodle.id }}" class="post-image">
                 <img src="/image/{{ doodle.image_url }}" alt="Doodle Image">
               </a>
               {% if doodle.reactions %}
                 <div class="reactions">
                   {% for emoji, count in doodle.reactions.items() %}
-                    <div>{{ emoji }}x{{ count }}</div>
+                    <div class="reaction-badge">{{ emoji }}x{{ count }}</div>
                   {% endfor %}
                 </div>
               {% endif %}
@@ -68,13 +68,13 @@
         <div class="doodles-grid-container">
           {% for doodle in liked_posts %}
             <div class="small-post">
-              <a href="/doodle/{{ doodle.id }}">
+              <a href="/doodle/{{ doodle.id }}" class="post-image">
                 <img src="/image/{{ doodle.image_url }}" alt="Doodle Image">
               </a>
               {% if doodle.reactions %}
                 <div class="reactions">
                   {% for emoji, count in doodle.reactions.items() %}
-                    <div>{{ emoji }}x{{ count }}</div>
+                    <div class="reaction-badge">{{ emoji }}x{{ count }}</div>
                   {% endfor %}
                 </div>
               {% endif %}

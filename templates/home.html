@@ -8,7 +8,7 @@
     {% else %}
       {% for doodle in doodles %}
         <div class="small-post">
-          <a href="/doodle/{{ doodle.id }}">
+          <a href="/doodle/{{ doodle.id }}" class="post-image">
             <img src="/image/{{ doodle.image_url }}" alt="Doodle Image">
           </a>
           {% if doodle.reactions %}
