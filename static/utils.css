@@ -2,6 +2,14 @@
     margin-left: 0.25rem;
 }
 
+.space-y-1 > * + * {
+    margin-top: 0.25rem;
+}
+
+.space-y-2 > * + * {
+    margin-top: 0.5rem;
+}
+
 .mx-auto {
     margin-left: auto;
     margin-right: auto;
@@ -9,6 +17,10 @@
 
 .ml-auto {
     margin-left: auto;
+}
+
+.inline-block {
+    display: inline-block;
 }
 
 .flex {
