@@ -191,6 +191,10 @@ def add_comment(doodle_id):
         "INSERT INTO comments (doodle_id, user_id, content) VALUES (?, ?, ?)",
         (doodle_id, user_id, content),
     )
+    db.execute(
+        "UPDATE doodles SET comments = comments + 1 WHERE id = ?",
+        (doodle_id,),
+    )
     db.commit()
 
     return redirect(url_for("doodle.page", doodle_id=doodle_id))
@@ -215,6 +219,11 @@ def delete_comment(doodle_id, comment_id):
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
+    db.execute(
+        "UPDATE doodles SET comments = comments - 1 WHERE id = ?",
+        (doodle_id,),
+    )
+
     db.commit()
 
     return redirect(url_for("doodle.page", doodle_id=doodle_id))

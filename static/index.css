@@ -53,18 +53,18 @@ footer {
     background-color: var(--card);
 }
 
-.doodles {
+.doodles-grid-container {
     margin-top: 0.5rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
 }
 
-.photo {
-    aspect-ratio: 1;
-    border-radius: var(--radius-md);
-    object-fit: contain;
-    border: 1px solid #e2e8f0;
+.reaction-badge {
+    border: var(--border);
+    border-radius: 0.25rem;
+    padding: 0.0rem 0.0rem 0.0rem;
+    background-color: #e1e1e1;
 }
 
 .small-post {
@@ -76,15 +76,15 @@ footer {
     display: flex;
     flex-direction: column;
     background-color: var(--card);
-    max-width: 25rem;
-
+    max-width: calc(min(100%, 25rem));
 
     img {
         border-radius: var(--radius-md);
-        object-fit: fill;
+        object-fit: cover;
         border: var(--border);
         width: 100%;
         height: 100%;
+        margin-bottom: 0.75rem;
     }
 
     .likes {
@@ -106,17 +106,6 @@ footer {
         margin-bottom: 0.2rem;
         display: flex;
         gap: 0.25rem;
-        /* Items to the left*/
-        justify-content: flex-start;
-
-
-        div {
-            border: var(--border);
-            border-radius: 1rem;
-            padding: 0.1rem 0.2rem 0.2rem;
-            background-color: #ececec;
-        }
-
     }
 
 }

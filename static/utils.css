@@ -15,10 +15,6 @@
     display: flex;
 }
 
-.flex-col {
-    flex-direction: column;
-}
-
 .items-center {
     align-items: center;
 }
@@ -35,6 +31,10 @@
     gap: 0.5rem;
 }
 
+.gap-1 {
+    gap: 0.25rem;
+}
+
 .mb-1 {
     margin-bottom: 0.25rem;
 }
@@ -43,6 +43,9 @@
     margin-bottom: 0.5rem;
 }
 
+.mt-auto {
+    margin-top: auto;
+}
 
 .sr-only {
     position: absolute;
@@ -55,7 +58,6 @@
     white-space: nowrap;
     border-width: 0;
 }
-
 
 
 .alert {

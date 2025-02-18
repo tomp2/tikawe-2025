@@ -43,9 +43,14 @@ CREATE TABLE IF NOT EXISTS doodles
     image_url   TEXT    NOT NULL,
     user_id     INTEGER NOT NULL,
     created_at  TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--  For performance and simpler queries, we store  the number of views, likes, reactions,
+--  and comments in the doodles table. This creates "two sources of truth" for these
+--  values, which is usually not ideal, but it's a tradeoff we're willing to make for simplicity
+--  and performance.
     views       INTEGER          DEFAULT 0,
     likes       INTEGER          DEFAULT 0,
     reactions   JSON             DEFAULT '{}',
+    comments    INTEGER          DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
