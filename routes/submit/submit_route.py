@@ -12,6 +12,7 @@ from flask import (
 
 from config import USER_IMAGE_UPLOADS_PATH
 from database import get_db
+from security_utils import check_csrf
 
 submit_blueprint = Blueprint("submit", __name__, url_prefix="/submit")
 
@@ -26,6 +27,7 @@ def is_allowed_file(filename):
 @submit_blueprint.route("/", methods=["GET"])
 def page():
     if "user_id" not in session:
+        flash("You must be logged in to submit a doodle", "error")
         return redirect(url_for("login.page"))
 
     db = get_db()
@@ -37,7 +39,10 @@ def page():
 def submit():
     user_id = session.get("user_id")
     if user_id is None:
-        return "Not logged in", 401
+        flash("You must be logged in to submit a doodle", "error")
+        return redirect(url_for("login.page"))
+
+    check_csrf()
 
     if "image" not in request.files:
         flash("No file detected in submission", "error")
@@ -66,7 +71,6 @@ def submit():
             "error",
         )
         return redirect(url_for("submit.page"))
-
 
     db = get_db()
     all_tag_rows = db.execute("SELECT name FROM tags").fetchall()

@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, session, redirect, url_for, flash
 from database import get_db
 
 profile_blueprint = Blueprint("profile", __name__, url_prefix="/profile")
@@ -9,6 +9,7 @@ profile_blueprint = Blueprint("profile", __name__, url_prefix="/profile")
 @profile_blueprint.route("/")
 def page():
     if "user_id" not in session:
+        flash("You must be logged in to view your profile", "error")
         return redirect(url_for("login.page"))
 
     db = get_db()

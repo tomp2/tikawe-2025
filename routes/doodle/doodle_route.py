@@ -10,6 +10,7 @@ from flask import (
 )
 
 from database import get_db
+from security_utils import check_csrf
 
 doodle_blueprint = Blueprint("doodle", __name__, url_prefix="/doodle")
 
@@ -69,6 +70,8 @@ def toggle_reaction(doodle_id):
         flash("You must be logged in to react.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
+    check_csrf()
+
     db = get_db()
     doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
@@ -118,6 +121,8 @@ def toggle_like(doodle_id):
         flash("You must be logged in to add likes.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
+    check_csrf()
+
     db = get_db()
     doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
@@ -161,6 +166,8 @@ def delete_doodle(doodle_id):
     if "user_id" not in session:
         return {"error": "Unauthorized"}, 401
 
+    check_csrf()
+
     user_id = session["user_id"]
     db = get_db()
     doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
@@ -178,7 +185,10 @@ def delete_doodle(doodle_id):
 @doodle_blueprint.route("/<int:doodle_id>/comment", methods=["POST"])
 def add_comment(doodle_id):
     if "user_id" not in session:
-        return {"error": "Unauthorized"}, 401
+        flash("You must be logged in to comment.", "error")
+        return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
+    check_csrf()
 
     user_id = session["user_id"]
     content = request.form["content"]
@@ -207,6 +217,8 @@ def delete_comment(doodle_id, comment_id):
     if "user_id" not in session:
         flash("You must be logged in to delete a comment.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
+
+    check_csrf()
 
     user_id = session["user_id"]
     db = get_db()
