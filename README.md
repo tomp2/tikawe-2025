@@ -1,4 +1,6 @@
-# CampusArt
+# Doodle App
+
+![](./screenshot.jpg)
 
 ### Sovelluksen tavoitteet
 
@@ -24,6 +26,7 @@
 - Käyttäjät voivat lisätä/poistaa tykkäyksen julkaisusta
 - Käyttäjät voivat kommentoida julkaisuja, ja hallinnoida omia kommenttejaan
 - Julkaisuihin voi liittää tageja, jotka helpottavat vastaavien julkaisujen löytämistä
+- CSRF, SQL-injection ja XSS hyökkäyksiltä on suojauduttu
 
 ## Sovelluksen asennus
 
