@@ -76,16 +76,6 @@ CREATE TABLE IF NOT EXISTS likes
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS views
-(
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    doodle_id INTEGER NOT NULL,
-    user_id   INTEGER,
-    viewed_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (doodle_id) REFERENCES doodles (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
-);
-
 
 CREATE TABLE IF NOT EXISTS reactions
 (
