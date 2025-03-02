@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS doodle_tags
     FOREIGN KEY (tag) REFERENCES tags (name)
 );
 
+CREATE INDEX IF NOT EXISTS idx_doodle_tags_doodle_id ON doodle_tags(doodle_id);
+
 
 CREATE TABLE IF NOT EXISTS doodles
 (
@@ -64,6 +66,8 @@ CREATE TABLE IF NOT EXISTS comments
     FOREIGN KEY (doodle_id) REFERENCES doodles (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+CREATE INDEX IF NOT EXISTS idx_comments_doodle_id ON comments(doodle_id);
+
 
 CREATE TABLE IF NOT EXISTS likes
 (
@@ -75,6 +79,9 @@ CREATE TABLE IF NOT EXISTS likes
     FOREIGN KEY (doodle_id) REFERENCES doodles (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+CREATE INDEX IF NOT EXISTS idx_likes_doodle_id ON likes(doodle_id);
+CREATE INDEX IF NOT EXISTS idx_likes_doodle_user_id ON likes(doodle_id, user_id);
+
 
 
 CREATE TABLE IF NOT EXISTS reactions
@@ -88,3 +95,6 @@ CREATE TABLE IF NOT EXISTS reactions
     FOREIGN KEY (doodle_id) REFERENCES doodles (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+CREATE INDEX IF NOT EXISTS idx_reactions_doodle_id ON reactions(doodle_id);
+CREATE INDEX IF NOT EXISTS idx_reactions_doodle_user_id ON reactions(doodle_id, user_id);
+
