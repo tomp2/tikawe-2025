@@ -2,6 +2,23 @@
 {% block title %}Home - Doodle App{% endblock %}
 {% block content %}
   <h2>Latest Doodles</h2>
+  {% if total_pages > 1 %}
+    <div class="pagination">
+      {% if page > 1 %}
+        <a href="?page={{ page - 1 }}" class="pagination-button">Previous</a>
+      {% endif %}
+
+      {% for p in range(1, total_pages + 1) %}
+        <a href="?page={{ p }}" class="pagination-button {% if p == page %}active{% endif %}">{{ p }}</a>
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="?page={{ page + 1 }}" class="pagination-button">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+
   <div class="doodles-grid-container">
     {% if doodles == [] %}
       <p>No doodles found.</p>
@@ -57,4 +74,21 @@
       {% endfor %}
     {% endif %}
   </div>
+  {% if total_pages > 1 %}
+    <div class="pagination">
+      {% if page > 1 %}
+        <a href="?page={{ page - 1 }}" class="pagination-button">Previous</a>
+      {% endif %}
+
+      {% for p in range(1, total_pages + 1) %}
+        <a href="?page={{ p }}" class="pagination-button {% if p == page %}active{% endif %}">{{ p }}</a>
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="?page={{ page + 1 }}" class="pagination-button">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+
 {% endblock %}
