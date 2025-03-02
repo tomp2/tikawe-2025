@@ -27,7 +27,7 @@ def page():
         password = request.form["password"]
         db = get_db()
         user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
+            "SELECT id, password_hash FROM users WHERE username = ?", (username,)
         ).fetchone()
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]

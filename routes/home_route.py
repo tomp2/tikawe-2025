@@ -9,7 +9,7 @@ home_blueprint = Blueprint("home", __name__, url_prefix="/")
 @home_blueprint.route("/")
 def page():
     db = get_db()
-    query = "SELECT * FROM doodles ORDER BY created_at DESC LIMIT 10"
+    query = "SELECT id, image_url, reactions, title, description, views, comments, likes, tags FROM doodles ORDER BY created_at DESC LIMIT 10"
     doodles = db.execute(query).fetchall()
     doodles_with_decoded_reactions = []
     for doodle in doodles:

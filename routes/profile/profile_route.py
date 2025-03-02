@@ -16,7 +16,7 @@ def page():
     user_id = session["user_id"]
 
     user_posts = db.execute(
-        "SELECT * FROM doodles WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
+        "SELECT id, image_url, reactions, title, tags, views, comments, likes FROM doodles WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
     ).fetchall()
     for doodle in user_posts:
         reactions = json.loads(doodle["reactions"])

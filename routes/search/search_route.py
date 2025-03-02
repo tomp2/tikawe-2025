@@ -21,7 +21,7 @@ def page():
         tag_name = query[1:]
         doodles = db.execute(
             """
-            SELECT d.* FROM doodles d
+            SELECT id, image_url, reactions, title, description, tags, views, comments, likes FROM doodles d
             JOIN doodle_tags dt ON d.id = dt.doodle_id
             JOIN tags t ON dt.tag = t.name
             WHERE t.name = ?
@@ -32,7 +32,12 @@ def page():
     elif query:
         search_query = f"%{query}%"
         doodles = db.execute(
-            "SELECT * FROM doodles WHERE title || ' ' || description LIKE ? ORDER BY created_at DESC",
+            """
+                SELECT id, image_url, reactions, title, description, tags, views, comments, likes
+                FROM doodles
+                WHERE title || ' ' || description LIKE ?
+                ORDER BY created_at DESC
+            """,
             (search_query,),
         ).fetchall()
 

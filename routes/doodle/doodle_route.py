@@ -18,7 +18,7 @@ doodle_blueprint = Blueprint("doodle", __name__, url_prefix="/doodle")
 @doodle_blueprint.route("/<int:doodle_id>")
 def page(doodle_id):
     db = get_db()
-    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    doodle = db.execute("SELECT id, title, likes, image_url, user_id, description, views FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
     if not doodle:
         return render_template("post_not_found.html"), 404
 
@@ -26,12 +26,12 @@ def page(doodle_id):
     db.commit()
 
     comments = db.execute(
-        "SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE doodle_id = ?",
+        "SELECT username, content, comments.id, username, user_id FROM comments JOIN users ON comments.user_id = users.id WHERE doodle_id = ?",
         (doodle_id,),
     ).fetchall()
 
     reactions = db.execute(
-        "SELECT emoji, COUNT(*) as count FROM reactions WHERE doodle_id = ? GROUP BY emoji",
+        "SELECT emoji, COUNT(1) as count FROM reactions WHERE doodle_id = ? GROUP BY emoji",
         (doodle_id,),
     ).fetchall()
     decoded_reactions = {reaction["emoji"]: reaction["count"] for reaction in reactions}
@@ -45,7 +45,7 @@ def page(doodle_id):
         decoded_users_reactions = {reaction["emoji"] for reaction in post_reactions}
 
     user_like_row = db.execute(
-        "SELECT * FROM likes WHERE doodle_id = ? AND user_id = ?",
+        "SELECT id FROM likes WHERE doodle_id = ? AND user_id = ?",
         (doodle_id, session.get("user_id")),
     ).fetchone()
 
@@ -73,7 +73,7 @@ def toggle_reaction(doodle_id):
     check_csrf()
 
     db = get_db()
-    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    doodle = db.execute("SELECT user_id FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
     if not doodle or doodle["user_id"] == session["user_id"]:
         flash("You cannot react to your own post.", "error")
@@ -81,7 +81,7 @@ def toggle_reaction(doodle_id):
 
     emoji_character = request.form["emoji"]
     existing_reaction_row = db.execute(
-        "SELECT * FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
+        "SELECT id FROM reactions WHERE doodle_id = ? AND user_id = ? AND emoji = ?",
         (doodle_id, session["user_id"], emoji_character),
     ).fetchone()
 
@@ -97,7 +97,7 @@ def toggle_reaction(doodle_id):
         )
 
     all_doodle_reactions = db.execute(
-        "SELECT COUNT(*) as count, emoji FROM reactions WHERE doodle_id = ? GROUP BY emoji",
+        "SELECT COUNT(1) as count, emoji FROM reactions WHERE doodle_id = ? GROUP BY emoji",
         (doodle_id,),
     ).fetchall()
     encoded_doodle_row_reactions_json = json.dumps(
@@ -124,14 +124,14 @@ def toggle_like(doodle_id):
     check_csrf()
 
     db = get_db()
-    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    doodle = db.execute("SELECT user_id FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
     if not doodle or doodle["user_id"] == session["user_id"]:
         flash("You cannot like your own post.", "error")
         return redirect(url_for("doodle.page", doodle_id=doodle_id))
 
     existing_like_row = db.execute(
-        "SELECT * FROM likes WHERE doodle_id = ? AND user_id = ?",
+        "SELECT id FROM likes WHERE doodle_id = ? AND user_id = ?",
         (doodle_id, session["user_id"]),
     ).fetchone()
 
@@ -170,7 +170,7 @@ def delete_doodle(doodle_id):
 
     user_id = session["user_id"]
     db = get_db()
-    doodle = db.execute("SELECT * FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
+    doodle = db.execute("SELECT user_id FROM doodles WHERE id = ?", (doodle_id,)).fetchone()
 
     if not doodle or doodle["user_id"] != user_id:
         flash("You can only delete your own doodles.", "error")
@@ -223,7 +223,7 @@ def delete_comment(doodle_id, comment_id):
     user_id = session["user_id"]
     db = get_db()
     comment = db.execute(
-        "SELECT * FROM comments WHERE id = ?", (comment_id,)
+        "SELECT user_id FROM comments WHERE id = ?", (comment_id,)
     ).fetchone()
 
     if not comment or comment["user_id"] != user_id:

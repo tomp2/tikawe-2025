@@ -58,7 +58,7 @@ def page():
         )
         db.commit()
         user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
+            "SELECT id FROM users WHERE username = ?", (username,)
         ).fetchone()
         session["user_id"] = user["id"]
         session["csrf_token"] = secrets.token_hex(16)
