@@ -5,7 +5,7 @@ VALUES (2, 'Patonki', '', '2025-02-16 21:31:14');
 INSERT INTO users (id, username, password_hash, created_at)
 VALUES (3, 'asdf', '', '2025-02-16 21:32:41');
 INSERT INTO users (id, username, password_hash, created_at)
-VALUES (4, 'Pepsi max', '', '2025-02-16 21:33:27');
+VALUES (4, 'Pepsi_max', '', '2025-02-16 21:33:27');
 INSERT INTO users (id, username, password_hash, created_at)
 VALUES (5, 'osajoukko', '', '2025-02-16 21:36:35');
 INSERT INTO users (id, username, password_hash, created_at)

@@ -1,3 +1,4 @@
+import re
 import secrets
 import sqlite3
 
@@ -27,7 +28,27 @@ def page():
         return render_template("register.html")
 
     username = request.form["username"]
+    if len(username) < 3:
+        flash("Username must be at least 3 characters long!", "error")
+        return redirect(url_for("register.page"))
+    if len(username) > 16:
+        flash("Username must be at most 16 characters long!", "error")
+        return redirect(url_for("register.page"))
+    if not re.match(r"^[a-zäöåA-ZÄÖÅ0-9_-]+$", username):
+        flash("Username must only contain letters, numbers, dashes, and underscores!", "error")
+        return redirect(url_for("register.page"))
+
     password = request.form["password"]
+    if len(password) < 12:
+        flash("Password must be at least 12 characters long!", "error")
+        return redirect(url_for("register.page"))
+    if len(password) > 128:
+        flash("Password must be at most 64 characters long!", "error")
+        return redirect(url_for("register.page"))
+    if not re.match(r"^[a-zöäåA-ZÄÖÅ0-9!@#$%^&*()_+-=]+$", password):
+        flash("Password must only contain letters, numbers and special characters (!@#$%^&*()_+-=)", "error")
+        return redirect(url_for("register.page"))
+
     db = get_db()
     hashed_password = generate_password_hash(password)
     try:
