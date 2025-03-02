@@ -9,7 +9,7 @@ from config import DATABASE_PATH
 
 def get_db() -> Connection:
     db = getattr(g, "_database", None)
-    if db is None:
+    if not db:
         db = g._database = sqlite3.connect(DATABASE_PATH)
 
         def make_dicts(cursor, row):

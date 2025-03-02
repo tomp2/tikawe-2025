@@ -7,7 +7,7 @@ from flask import (
     session,
     render_template,
 )
-
+import markupsafe
 import config
 from config import USER_IMAGE_UPLOADS_PATH, DATABASE_PATH
 from routes.doodle.doodle_route import doodle_blueprint
@@ -34,6 +34,13 @@ app.register_blueprint(profile_blueprint)
 app.register_blueprint(register_blueprint)
 app.register_blueprint(search_blueprint)
 app.register_blueprint(submit_blueprint)
+
+
+@app.template_filter()
+def show_lines(content):
+    content = str(markupsafe.escape(content))
+    content = content.replace("\n", "<br />")
+    return markupsafe.Markup(content)
 
 
 @app.route("/logout")

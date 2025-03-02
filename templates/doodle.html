@@ -50,7 +50,7 @@
       {% endif %}
     </div>
 
-    <p>{{ doodle.description }}</p>
+    <p>{{ doodle.description | show_lines }} </p>
 
     <div>
       {% for tag in doodle_tags %}

@@ -38,7 +38,7 @@ def page():
 @submit_blueprint.route("/", methods=["POST"])
 def submit():
     user_id = session.get("user_id")
-    if user_id is None:
+    if not user_id:
         flash("You must be logged in to submit a doodle", "error")
         return redirect(url_for("login.page"))
 
