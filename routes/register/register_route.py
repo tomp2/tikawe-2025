@@ -17,7 +17,7 @@ from database import get_db
 register_blueprint = Blueprint("register", __name__, url_prefix="/register")
 
 
-@register_blueprint.route("/", methods=["POST"])
+@register_blueprint.route("/", methods=["GET", "POST"])
 def page():
     if "user_id" in session:
         flash("You are already logged in!", "error")
