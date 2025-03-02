@@ -35,8 +35,8 @@
               {% endfor %}
             </div>
           {% endif %}
-          <a href="/doodle/{{ doodle.id }}"><h3>{{ doodle.title }}</h3></a>
-          <p>{{ doodle.description | show_lines }}</p>
+          <a href="/doodle/{{ doodle.id }}"><h3 class="title">{{ doodle.title }}</h3></a>
+          <p class="description">{{ doodle.description | show_lines }}</p>
           <div class="tags">
             {% for tag in doodle.tags.split(',') %}
               <a href="{{ url_for('search.page', q='#'+tag) }}" class="tag-badge">#{{ tag }}</a>
