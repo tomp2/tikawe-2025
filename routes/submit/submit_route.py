@@ -64,7 +64,7 @@ def submit():
         flash("Description is too long (max 80 characters)", "error")
         return redirect(url_for("submit.page"))
 
-    image = request.files["image"]
+    image = request.files.get("image")
     if not image or not is_allowed_file(image.filename):
         flash(
             f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}",

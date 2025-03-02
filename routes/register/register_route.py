@@ -13,6 +13,12 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash
 
+from config import (
+    USERNAME_MIN_LEN,
+    USERNAME_MAX_LEN,
+    PASSWORD_MIN_LEN,
+    PASSWORD_MAX_LEN,
+)
 from database import get_db
 
 register_blueprint = Blueprint("register", __name__, url_prefix="/register")
@@ -28,25 +34,31 @@ def page():
         return render_template("register.html")
 
     username = request.form["username"]
-    if len(username) < 3:
-        flash("Username must be at least 3 characters long!", "error")
+    if len(username) < USERNAME_MIN_LEN:
+        flash(f"Username must be at least {USERNAME_MIN_LEN} characters long!", "error")
         return redirect(url_for("register.page"))
-    if len(username) > 16:
-        flash("Username must be at most 16 characters long!", "error")
+    if len(username) > USERNAME_MAX_LEN:
+        flash(f"Username must be at most {USERNAME_MAX_LEN} characters long!", "error")
         return redirect(url_for("register.page"))
     if not re.match(r"^[a-zäöåA-ZÄÖÅ0-9_-]+$", username):
-        flash("Username must only contain letters, numbers, dashes, and underscores!", "error")
+        flash(
+            "Username must only contain letters, numbers, dashes, and underscores!",
+            "error",
+        )
         return redirect(url_for("register.page"))
 
     password = request.form["password"]
-    if len(password) < 12:
-        flash("Password must be at least 12 characters long!", "error")
+    if len(password) < PASSWORD_MIN_LEN:
+        flash(f"Password must be at least {PASSWORD_MIN_LEN} characters long!", "error")
         return redirect(url_for("register.page"))
-    if len(password) > 128:
-        flash("Password must be at most 64 characters long!", "error")
+    if len(password) > PASSWORD_MAX_LEN:
+        flash(f"Password must be at most {PASSWORD_MAX_LEN} characters long!", "error")
         return redirect(url_for("register.page"))
     if not re.match(r"^[a-zöäåA-ZÄÖÅ0-9!@#$%^&*()_+-=]+$", password):
-        flash("Password must only contain letters, numbers and special characters (!@#$%^&*()_+-=)", "error")
+        flash(
+            "Password must only contain letters, numbers and special characters (!@#$%^&*()_+-=)",
+            "error",
+        )
         return redirect(url_for("register.page"))
 
     db = get_db()
